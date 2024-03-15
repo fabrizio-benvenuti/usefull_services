@@ -1,0 +1,11 @@
+[Unit]
+Description=Disk Usage Tree Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /init/disk_usage_tree.sh
+SyslogIdentifier=disk-usage-tree
+
+[Install]
+WantedBy=multi-user.target

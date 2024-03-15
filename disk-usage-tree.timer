@@ -1,0 +1,10 @@
+[Unit]
+Description=Disk Usage Tree Timer
+
+[Timer]
+OnUnitActiveSec=2h
+RandomizedDelaySec=1800
+Unit=disk-usage-tree.service
+
+[Install]
+WantedBy=timers.target

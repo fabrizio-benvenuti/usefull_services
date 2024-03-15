@@ -1,0 +1,6 @@
+[Unit]
+Description=Image Cleanup Service
+
+[Service]
+Type=oneshot
+ExecStart=/init/image_cleanup.sh
