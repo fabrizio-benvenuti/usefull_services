@@ -12,7 +12,7 @@ usefull services for an ubuntu server
 ``` bash
   sudo systemctl enable abc.timer
 ```
-* run for every efg.service you imported 
+* run for every __UNTIMERED__ efg.service you imported 
 ``` bash
   sudo systemctl enable efg.service
 ```
