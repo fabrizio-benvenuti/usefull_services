@@ -3,7 +3,7 @@ usefull services for an ubuntu server
 
 # Usage
 * copy  all the abc.service and abc.timer files of all the timered services you want to add to your server into your /etc/systemd/system/ directory
-* copy all the abc.service files of all the untimered services you want to add to your server into your /etc/systemd/system/ directory
+* copy all the efg.service files of all the untimered services you want to add to your server into your /etc/systemd/system/ directory
 * run
 ``` bash
   sudo systemctl daemon-reload
