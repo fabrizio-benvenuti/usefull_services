@@ -1,0 +1,110 @@
+#!/bin/bash
+while(true); do
+# Calculate the timestamp for 12 hours ago
+twelve_hours_ago=$(date -d "12 hours ago" "+%Y-%m-%d %H:%M:%S")
+
+# Filter the speedtest data for the past 12 hours
+filtered_data=$(awk -v twelve_hours_ago="$twelve_hours_ago" '$0 > twelve_hours_ago' /home/server2/speedtest.txt)
+
+# Save the filtered data to a temporary file
+echo "$filtered_data" > /tmp/speedtest_filtered.txt
+
+# Extract download and upload speeds from the filtered data
+awk '/Download:/ {print $2}' /tmp/speedtest_filtered.txt > /tmp/download_speeds.txt
+awk '/Upload:/ {print $2}' /tmp/speedtest_filtered.txt > /tmp/upload_speeds.txt
+
+# Plot the speeds histogram
+gnuplot -persist <<-EOFMarker
+    set terminal png size 800,600
+    set output '/tmp/speeds_histogram.png'
+    set title "Download and Upload Speeds Histogram"
+    set xlabel "Speed (Mbit/s)"
+    set ylabel "Frequency"
+    set xtics 10
+
+    # For Download speeds
+    download_binwidth=20
+    download_bin(x,width)=width*floor(x/width) + download_binwidth/2.0
+
+    # For Upload speeds
+    upload_binwidth=5
+    upload_bin(x,width)=width*floor(x/width) + upload_binwidth/2.0
+    plot '/tmp/download_speeds.txt' using (download_bin(\$1,download_binwidth)):(1.0) smooth frequency with boxes title "Download", \
+         '/tmp/upload_speeds.txt' using (upload_bin(\$1,upload_binwidth)):(1.0) smooth frequency with boxes title "Upload"
+
+EOFMarker
+
+# Extract timestamps and speeds for plotting speeds versus time
+#!/bin/bash
+
+# Input file
+input_file="/tmp/speedtest_filtered.txt"
+
+# Output file
+output_file="/tmp/speeds_vs_time.txt"
+# Remove existing output file
+
+# Read the input file line by line
+while IFS= read -r line; do
+    # Check if the line starts with "Download"
+    if [[ $line == "Download"* ]]; then
+        # Extract download speed
+        download_speed=$(echo "$line" | cut -d' ' -f2)
+        # Read the next line for upload speed
+        read -r upload_line
+        # Extract upload speed
+        upload_speed=$(echo "$upload_line" | cut -d' ' -f2)
+        # Read the next line for timestamp
+        read -r timestamp_line
+        # Extract timestamp and only the time part
+        time=$(echo "$timestamp_line" | cut -d'.' -f1)
+        # Print formatted output with time only
+        echo "$download_speed $upload_speed $time" >> "$output_file"
+    fi
+done < "$input_file"
+# Gnuplot script
+gnuplot_script="/init/plot_speeds.gp"
+
+# Execute Gnuplot with the generated script
+gnuplot -persist "$gnuplot_script"
+
+
+# Recipient email address
+recipient="iu5ofy.qsl@gmail.com"
+
+# SMTP server details
+smtp_server="smtp.gmail.com"
+smtp_port="587"  # Port for SMTP submission (587 is common for TLS)
+
+# Sender email address and authentication details
+sender="speedteststarlink@gmail.com"
+password="hvuxrhhiudchuejq"  # Replace with your actual password
+
+# Email subject and body
+subject="Speed Test Results"
+body="Please find the attached speed test results."
+cc1="tecnoroby@gmail.com"
+# Attachments
+attachment1="/tmp/speeds_histogram.png"
+attachment2="/tmp/speeds_vs_time.png"
+
+# Send email with attachments using sendemail
+sendemail -f "$sender" \
+    -t "$recipient" \
+    -cc "$cc1" \
+    -u "$subject" \
+    -m "$body" \
+    -s "$smtp_server":"$smtp_port" \
+    -xu "$sender" \
+    -xp "$password" \
+    -o tls=yes \
+    -a "$attachment1" \
+    -a "$attachment2"
+
+echo "Email sent to $recipient"
+
+
+# Clean up temporary files
+rm /tmp/speedtest_filtered.txt /tmp/download_speeds.txt /tmp/upload_speeds.txt /tmp/speeds_vs_time.txt /tmp/speeds_histogram.png /tmp/speeds_vs_time.png
+sleep 14400
+done

@@ -1,0 +1,12 @@
+[Unit]
+Description=Run sync Every Hour
+
+[Timer]
+OnBootSec=0min
+OnUnitActiveSec=1h
+AccuracySec=10min
+RandomizedDelaySec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

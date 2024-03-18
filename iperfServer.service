@@ -1,0 +1,10 @@
+[Unit]
+Description=Fa partire un Server Iperf3
+After=network.target
+
+[Service]
+ExecStart=/init/iperfServer.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

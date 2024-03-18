@@ -1,0 +1,10 @@
+[Unit]
+Description=Wait for Samba share to be mounted and start sync
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c "while [ ! -d /home/server2/samba/A ]; do sleep 60; mount -a; done && /init/sync.sh"
+
+[Install]
+WantedBy=multi-user.target
+

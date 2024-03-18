@@ -1,0 +1,12 @@
+[Unit]
+Description=Run plot_speeds Every 4 Hours
+
+[Timer]
+OnBootSec=0min
+OnUnitActiveSec=4h
+AccuracySec=20min
+RandomizedDelaySec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

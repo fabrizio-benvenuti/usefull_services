@@ -1,0 +1,10 @@
+[Unit]
+Description=Plot Speeds Service
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/init/plot_speeds.sh
+
+[Install]
+WantedBy=multi-user.target
